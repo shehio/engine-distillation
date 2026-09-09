@@ -1,4 +1,4 @@
-# world-models — chess & go, distilled from Stockfish/KataGo on one GPU
+# world-models: Stockfish distilled into AlphaZero's network
 
 **Chess**: [2,301 Elo](https://shehio.github.io/world-models/experiments/#peak-elo)
 (R2 v2 ep 14 vs Stockfish UCI=1,800, sims=4,000, 95% CI [2,190, 2,601])

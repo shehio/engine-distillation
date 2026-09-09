@@ -1,12 +1,12 @@
 baseURL = "https://shehio.github.io/world-models/"
 languageCode = "en-us"
-title = "world-models — chess & go, distilled from Stockfish/KataGo on one GPU"
+title = "world-models: Stockfish distilled into AlphaZero's network"
 # Rewrite absolute URLs in content (e.g. /baseline/) so they pick up the
 # /world-models/ subpath when deployed to project Pages.
 canonifyURLs = true
 
 [params]
-  description = "AlphaZero's network on one GPU, ~10,000x less compute. Supervised distillation from Stockfish, then RL self-play."
+  description = "Supervised distillation of Stockfish into AlphaZero's network: 2,301 Elo chess, with ablations and published negative results."
 
 [markup]
   [markup.goldmark]

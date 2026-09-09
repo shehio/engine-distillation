@@ -2,7 +2,7 @@
   <rect width="1200" height="630" fill="#0a0a0a"/>
   <g font-family="ui-monospace, monospace" fill="#e2e2e2">
     <text x="80" y="120" font-size="34" letter-spacing="5" font-weight="300">world models · chess</text>
-    <text x="80" y="160" font-size="22" fill="#7a7a7a" letter-spacing="2">alphazero's network · single gpu</text>
+    <text x="80" y="160" font-size="22" fill="#7a7a7a" letter-spacing="2">alphazero's network · distilled from stockfish</text>
 
     <!-- big number -->
     <text x="80" y="380" font-size="200" letter-spacing="-2" font-weight="300" fill="#00d4aa">2,171</text>
