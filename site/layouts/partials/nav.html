@@ -1,29 +1,23 @@
-<nav>
-  <a href="{{ "/" | relURL }}" class="nav-logo">wm·chess</a>
+<nav aria-label="Main navigation">
+  <a href="{{ "/" | relURL }}" class="nav-logo" aria-label="World Models home">world-models</a>
   <div class="nav-links">
-    <a href="{{ "/experiments/" | relURL }}">experiments</a>
-    <a href="{{ "/method/" | relURL }}">method</a>
-    <a href="{{ "/vs-alphazero/" | relURL }}">vs AZ</a>
-    <a href="{{ "/vs-leela/" | relURL }}">vs Lc0</a>
-    <a href="{{ "/vs-muzero/" | relURL }}">vs MuZero</a>
-    <a href="{{ "/go/" | relURL }}">go (9×9)</a>
-    <a href="{{ "/next/" | relURL }}">what's next</a>
-    <a href="{{ "/infra/" | relURL }}">infra</a>
-    <button class="theme-toggle" type="button" aria-label="Toggle light or dark theme">theme</button>
+    <a href="{{ "/method/" | relURL }}">Method</a>
+    <a href="{{ "/experiments/" | relURL }}">Experiments</a>
+    <details class="nav-more"><summary>Explore</summary><div>
+      <a href="{{ "/vs-alphazero/" | relURL }}">AlphaZero</a><a href="{{ "/vs-leela/" | relURL }}">Leela &amp; self-play</a><a href="{{ "/vs-muzero/" | relURL }}">MuZero</a><a href="{{ "/go/" | relURL }}">Go (9 × 9)</a><a href="{{ "/failures/" | relURL }}">Negative results</a><a href="{{ "/next/" | relURL }}">Research log</a><a href="{{ "/infra/" | relURL }}">Infrastructure</a><a href="https://github.com/shehio/world-models">GitHub ↗</a>
+    </div></details>
+    <button class="theme-toggle" type="button" aria-label="Toggle light or dark theme">Theme</button>
   </div>
 </nav>
 <script>
 (function () {
-  var btn = document.querySelector('.theme-toggle');
-  if (!btn) return;
-  function current() {
-    return document.documentElement.getAttribute('data-theme')
-      || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  }
-  btn.addEventListener('click', function () {
-    var next = current() === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    try { localStorage.setItem('wm-theme', next); } catch (e) {}
-  });
+  var btn = document.querySelector('.theme-toggle'), menu = document.querySelector('.nav-more');
+  function current() {return document.documentElement.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');}
+  function label() {btn.setAttribute('aria-label', 'Switch to ' + (current() === 'dark' ? 'light' : 'dark') + ' theme');}
+  label();
+  btn.addEventListener('click', function () {var next = current() === 'dark' ? 'light' : 'dark';document.documentElement.setAttribute('data-theme', next);try {localStorage.setItem('wm-theme', next);} catch (e) {}label();});
+  document.addEventListener('click', function (e) {if (!menu.contains(e.target)) menu.open = false;});
+  document.addEventListener('keydown', function (e) {if (e.key === 'Escape' && menu.open) {menu.open = false;menu.querySelector('summary').focus();}});
+  document.querySelectorAll('.nav-links a').forEach(function (a) {if (new URL(a.href).pathname === location.pathname) a.setAttribute('aria-current', 'page');});
 })();
 </script>

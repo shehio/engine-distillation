@@ -1,10 +1,12 @@
 ---
 title: "What's next"
-subtitle: "distill-then-RL: a distilled prior plus self-play, running on an EKS pod right now"
+subtitle: "Dated research log: distillation, self-play and follow-up evaluations"
 next: "/infra/"
 aliases:
   - /selfplay/
 ---
+
+> This page preserves dated research notes. References to running jobs describe their recorded dates, not live infrastructure status. See the [evaluation table](/experiments/#peak-elo) for the published results.
 
 ## The Central Observation
 
@@ -250,26 +252,23 @@ All trained checkpoints remain on S3 at
 Nothing is lost; the runs can resume from any saved epoch if a future
 hypothesis justifies it.
 
-**Update 2026-05-26 23:06 UTC: the 2,300 line is broken.** The
+**Update 2026-05-26 23:06 UTC: a 2,301 point estimate.** The
 "ep 14 sims=800 was the run's highest but never got a deep-eval" lead
 turned into the project's strongest measurement: **R2 v2 ep 14 at
-sims=4,000 vs UCI=1,800 = 2,301 Elo** [2,190, 2,601], 95% CI lower
-bound strictly above the prior peak (d10 ep 15 = 2,189). One last
-in-flight eval (R2 v2 ep 4 at sims=8,000 vs UCI=2,000) will give the
-tightest single CI of any chess measurement to date, landing within
-minutes. The two cheap follow-up evals were:
+sims=4,000 vs UCI=1,800 = 2,301 Elo** [2,190, 2,601], an interval that overlaps the prior peak measurement (d10 ep 15 = 2,189 [2,098, 2,354]). The follow-up R2 v2 ep 4 evaluation at sims=8,000 vs UCI=2,000
+subsequently returned 2,153 Elo [2,084, 2,235]. The two cheap follow-up evals were:
 
 | Eval | Instance | What it answers |
 |---|---|---|
-| sims=8,000 vs UCI=2,000 on **R2 v2 ep 4** | us-east-1 g6.4xlarge OD `i-04f84755196ee0163` (~$5) | Does deeper search on the top ckpt give a tighter CI? UCI=2,000 anchor keeps score near 0.5. _In final ~10 min as of 2026-05-26 22:30 UTC._ |
-| sims=4,000 vs UCI=1,800 on **R2 v2 ep 14** | us-east-1 g6.2xlarge OD `i-0b24ea8a7fdd7d149` (~$5) | R2 v2 ep 14 had the highest sims=800 of the run (2,055) but was never deep-eval'd. **Landed 2026-05-26 23:06 UTC: 2,301 Elo [2,190, 2,601], first project measurement with a 95% lower CI bound above 2,300.** |
+| sims=8,000 vs UCI=2,000 on **R2 v2 ep 4** | us-east-1 g6.4xlarge OD `i-04f84755196ee0163` (~$5) | Does deeper search on the top ckpt give a tighter CI? UCI=2,000 anchor keeps score near 0.5. Completed: **2,153 Elo [2,084, 2,235]**; see the experiments table. |
+| sims=4,000 vs UCI=1,800 on **R2 v2 ep 14** | us-east-1 g6.2xlarge OD `i-0b24ea8a7fdd7d149` (~$5) | R2 v2 ep 14 had the highest sims=800 of the run (2,055) but was never deep-eval'd. **Landed 2026-05-26 23:06 UTC: 2,301 Elo [2,190, 2,601], point estimate above 2,300; the confidence interval includes values below 2,300.** |
 
 Per-ckpt sims=800 evals normally fire via the
 [autoeval daemon](https://github.com/shehio/world-models/blob/main/infra-eks/daemons/wm-autoeval-daemon.sh)
 when the operator laptop is on; ckpts crossing 1,940 trigger a
 sims=4,000 deep-read via the
 [`wm-deep-eval-daemon`](https://github.com/shehio/world-models/blob/main/infra-eks/daemons/wm-deep-eval-daemon.sh).
-With the laptop currently offline, the two evals above were launched
+With the laptop offline at the time, the two evals above were launched
 as one-shot scripts.
 
 ## The 2,500 Ceiling: What's in the Way and Why

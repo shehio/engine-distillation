@@ -1,283 +1,39 @@
 {{ define "main" }}
 <section class="hero">
-  <div class="board-grid" aria-hidden="true"></div>
-  <p class="hero-kicker">supervised distillation from Stockfish</p>
-  <h1>world-models</h1>
-  <p class="tagline">AlphaZero's network, distilled from Stockfish · 2,301 Elo</p>
-  <div class="hero-stats">
-    <div class="stat"><span class="v">2,301</span><span class="k">Elo · chess vs calibrated Stockfish</span></div>
-    <div class="stat"><span class="v">2,153</span><span class="k">Elo · sims=8,000, 95% CI [2,084, 2,235]</span></div>
-    <div class="stat"><span class="v">~16</span><span class="k">GPU-hours per training run</span></div>
-    <div class="stat"><span class="v">~10,000×</span><span class="k">fewer FLOPs than AlphaZero</span></div>
-  </div>
+  <p class="hero-kicker">world-models / a chess learning study</p>
+  <h1>Learning chess<br>from a strong teacher.</h1>
+  <p class="home-intro">Stockfish supplies the examples. An AlphaZero-style network learns from them. Tree search turns its predictions into moves.</p>
+  <div class="home-actions"><a class="primary-link" href="{{ "/method/" | relURL }}">Explore the method →</a><a href="{{ "/experiments/" | relURL }}">Read the experiments</a><a href="https://github.com/shehio/world-models">GitHub ↗</a></div>
 </section>
-
-<section class="result-strip">
-  <div class="result-box">
-    <div class="result-label">peak measured strength</div>
-    <div class="result-num">2,301</div>
-    <div class="result-unit">Elo</div>
-    <div class="ci-bar" aria-hidden="true">
-      <span class="ci-track"></span>
-      <span class="ci-range" style="left:16.4%; right:8.9%"></span>
-      <span class="ci-thresh" style="left:36.4%"><span>2,300</span></span>
-      <span class="ci-point" style="left:36.5%"></span>
-    </div>
-    <div class="result-context">R2 v2 (d15 46M, 20×256 cosine) ep 14 · sims=4,000 · vs UCI=1,800 · CI [2,190, 2,601] · <a href="{{ "/experiments/#peak-elo" | relURL }}">full peak table</a></div>
-  </div>
-  <div class="result-context-block">
-    <p>AlphaZero used <em>5,000 TPUs</em> for self-play data generation and <em>64 TPU-v2s</em> to train. We use the <strong>same network family</strong> (20- or 40-block × 256-channel ResNet, ~24–50M parameters) on <em>one GPU</em>, supervised distillation from Stockfish on 30–46M positions, evaluated against a calibrated Stockfish opponent. Total cost per training run: ~16–80 GPU-hours on a single L40S. Roughly <strong>four orders of magnitude less compute</strong> than the AlphaZero paper.</p>
-    <p>2,301 is the project's top point estimate <em>and</em> the tightest-CI measurement that crosses 2,300: the 95% lower bound (2,190) clears the previous peak (d10 30M ep 15 = 2,189). A wider-CI sibling, R2 v2 <strong>ep 4</strong> at the same anchor, was 2,285 [2,177, 2,554]; both clear the d10 ceiling. <strong>R1 v2 ep 7 = 2,209</strong> [2,115, 2,389] is the 40×256 cosine variant's best. Full numbers on the <a href="{{ "/experiments/#peak-elo" | relURL }}">experiments page</a>. The self-play follow-on hasn't survived a spot AZ on chess but is currently running successfully on the Go side: <a href="{{ "/next/#selfplay-postmortem" | relURL }}">postmortem &amp; live status</a>.</p>
-    <p class="quick-links">
-      <a href="{{ "/experiments/" | relURL }}">→ How we got here</a>
-      <a href="{{ "/method/" | relURL }}">→ Method &amp; Elo bisection</a>
-      <a href="{{ "/vs-alphazero/" | relURL }}">→ vs AZ</a>
-      <a href="{{ "/vs-leela/" | relURL }}">→ vs Leela</a>
-      <a href="{{ "/vs-muzero/" | relURL }}">→ vs MuZero</a>
-      <a href="{{ "/go/" | relURL }}">→ Go (9×9)</a>
-      <a href="{{ "/next/" | relURL }}">→ What's next</a>
-    </p>
-  </div>
+<section class="home-results" aria-label="Recorded chess evaluations">
+  <article><span class="result-label">Highest point estimate</span><strong>2,301 <small>Elo</small></strong><p>95% CI: 2,190–2,601</p><p class="dim">R2 v2 · epoch 14 · 4,000 simulations<br>Calibrated Stockfish at UCI 1,800</p></article>
+  <article><span class="result-label">Tighter interval, separate evaluation</span><strong>2,153 <small>Elo</small></strong><p>95% CI: 2,084–2,235</p><p class="dim">R2 v2 · epoch 4 · 8,000 simulations<br>Calibrated Stockfish at UCI 2,000</p></article>
+  <article class="result-reading"><span class="result-label">How to read the result</span><h2>A measured estimate.</h2><p>The peak interval spans 2,300. These are engine-relative estimates under the stated evaluation settings, not a tournament rating or a head-to-head result against AlphaZero.</p><a href="{{ "/experiments/#peak-elo" | relURL }}">Evaluation details →</a></article>
 </section>
-
-<section class="band">
-  {{ partial "figure-ladder.html" . }}
-</section>
-
-<section class="method-section">
-  <div class="coord rv">a1 &middot; how it works</div>
-  <h2 class="rv">How It Works</h2>
-  <p class="lede rv">Two phases. <em>Training</em> is a single supervised pass: Stockfish labels positions, the student fits those labels. <em>Inference</em> is Monte Carlo Tree Search using the trained network as its prior. The network alone never picks a move; MCTS does, and the network just guides where MCTS looks.</p>
-  <div class="pq rv">At fixed single-GPU compute, <b>distillation beats self-play.</b> For chess it is a rout; for Go a tie. Either way the shortcut is the teacher.</div>
-
-  <h3 class="sub">1 · Training (one-shot, no self-play)</h3>
-  <ol class="steps">
-    <li><strong>Stockfish self-plays</strong> games at search-depth 15. At every position, before the chosen move is played, Stockfish reports its top-8 candidate moves with centipawn scores.</li>
-    <li>Those scores become a soft distribution <code>π</code> over the 8 candidates (softmax at <em>T = 1 pawn</em>). The game outcome <code>z ∈ {−1, 0, +1}</code> is recorded from each side-to-move POV.</li>
-    <li>The student trains on <strong>(state, π, z)</strong> triples: cross-entropy on the policy head against <code>π</code>, MSE on the value head against <code>z</code>. No self-play, no MCTS at training time.</li>
-  </ol>
-
-  <h3 class="sub">2 · The Network</h3>
-  <p>20 residual blocks × 256 channels, ~24M parameters. Input: a 19-plane encoding of the current board (piece positions, side-to-move, castling rights, repetitions). Output: a 4,672-dim policy logits vector and a scalar value in <code>[−1, +1]</code>. Same architecture AlphaZero used; only the way we got the weights differs.</p>
+<section class="method-section home-method">
+  <div class="section-heading"><div><p class="hero-kicker">01 / the method</p><h2>From examples to decisions</h2></div><a href="{{ "/method/" | relURL }}">Full method →</a></div>
+  <div class="home-steps"><article><span>01</span><h3>Collect</h3><p>Stockfish labels board positions with candidate moves and scores. Recorded game outcomes supply value targets.</p></article><article><span>02</span><h3>Distill</h3><p>A residual network learns a move distribution and a value estimate through supervised training.</p></article><article><span>03</span><h3>Search</h3><p>At inference, Monte Carlo Tree Search uses those predictions to explore moves and choose an action.</p></article></div>
   {{ partial "architecture-svg.html" . }}
-
-  <h3 class="sub">3 · Playing a Move (Network + MCTS, end-to-end)</h3>
-  <p>The trained network is a <em>prior</em> over moves and a <em>value estimator</em> for leaf positions; the actual move comes from Monte Carlo Tree Search built on top of those two signals. One move at the root costs N <em>simulations</em> (800 for the routine eval, 4,000 for the search-saturated eval). Each simulation is:</p>
-  <ol class="steps">
-    <li><strong>Selection.</strong> Starting at the root (the current position), walk down the search tree by repeatedly picking the child that maximises <code>Q + U</code>: average value seen below this move + an exploration bonus proportional to the network's prior <code>P</code> and inversely proportional to how many times we've already visited this child. The network's policy is the bias; the running statistics correct it as evidence accumulates.</li>
-    <li><strong>Expansion + evaluation.</strong> When you hit a node that hasn't been expanded yet, encode that position to 19 planes, run <em>one</em> network forward pass, and store the policy logits as priors for its children + the value estimate as the value of the leaf.</li>
-    <li><strong>Backup.</strong> Propagate that leaf value back up the path you took, incrementing each parent's visit count and updating the running <code>Q</code> with the new estimate. Sign-flip at every ply because chess alternates side-to-move.</li>
-  </ol>
-  <p>Repeat for N sims. Then pick the move at the root with the <strong>highest visit count</strong> (not highest <code>Q</code>; visit counts are MCTS's improved policy estimate). At higher sims/move, MCTS spends more rollouts refining the prior into a sharper visit distribution; that's why the same checkpoint scores 1,807 Elo at 800 sims and 2,084 Elo at 4,000 sims (see <a href="{{ "/experiments/#search" | relURL }}">the search ablation</a>).</p>
-  {{ partial "mcts-svg.html" . }}
-  <p class="dim">Implementation: the encode is <a href="https://github.com/shehio/world-models/blob/main/wm_chess/src/wm_chess/board.py"><code>encode_board</code></a>, the network forward is <a href="https://github.com/shehio/world-models/blob/main/wm_chess/src/wm_chess/network.py"><code>AlphaZeroNet.forward</code></a>, and the MCTS loop is <a href="https://github.com/shehio/world-models/blob/main/wm_chess/src/wm_chess/mcts.py"><code>run_mcts</code> / <code>run_mcts_batched</code></a>. The selection formula is straight from the AlphaGo Zero paper: <code>U(s,a) = c_puct · P(s,a) · √Σ_b N(s,b) / (1 + N(s,a))</code>.</p>
-  <p><a href="{{ "/method/" | relURL }}">→ Full method, including the loss formula and Elo bisection</a></p>
+  <p class="dim">The main 20 × 256 network has about 24 million parameters. The project also tests a 40-block variant, self-play follow-ons and learned-model search.</p>
 </section>
-
 <section class="experiments">
-  <div class="coord rv">b2 &middot; the ablations</div>
-  <h2 class="rv">Experiments</h2>
-  <p class="lede rv">Single-variable ablations on top of the distilled baseline. Each card shows the hypothesis, the verdict, and the headline numbers. Full setup + interpretation on the <a href="{{ "/experiments/" | relURL }}">experiments page</a>.</p>
-
-  {{ partial "figure-levers.html" . }}
-
-  <div class="hypothesis-grid">
-
-    <article class="hypothesis teaser">
-      <div class="head">
-        <span class="tag">Network Capacity</span>
-        <span class="badge rejected">Rejected</span>
-      </div>
-      <h3>Doubling Network Depth 20 → 40 Blocks Didn't Help</h3>
-      <p class="hyp-line">5M positions for a 24M-param network is already in the over-parameterized regime. More capacity finds no structure that isn't there.</p>
-      <div class="result-row">
-        <div class="stat"><span class="label">20-block</span><span class="value">1,810</span></div>
-        <div class="stat"><span class="label">40-block (2× depth)</span><span class="value">1,810</span></div>
-        <div class="stat"><span class="label">delta</span><span class="value">±0</span></div>
-      </div>
-      <p class="card-link"><a href="{{ "/experiments/#capacity" | relURL }}">→ Read the capacity ablation</a></p>
-    </article>
-
-    <article class="hypothesis teaser">
-      <div class="head">
-        <span class="tag">Eval-Side Search</span>
-        <span class="badge confirmed">Confirmed</span>
-      </div>
-      <h3>+277 Elo From Deeper MCTS at Inference: No Retraining</h3>
-      <p class="hyp-line">Distilled priors transfer well to deeper inference-time search, exactly Lc0's empirical finding. The "1,800 ceiling" was an eval-time artifact.</p>
-      <div class="result-row">
-        <div class="stat"><span class="label">800 sims</span><span class="value">1,807</span></div>
-        <div class="stat"><span class="label">4,000 sims</span><span class="value">2,084</span></div>
-        <div class="stat"><span class="label">delta</span><span class="value">+277</span></div>
-      </div>
-      <p class="card-link"><a href="{{ "/experiments/#search" | relURL }}">→ Read the search ablation</a></p>
-    </article>
-
-    <article class="hypothesis teaser">
-      <div class="head">
-        <span class="tag">Data Scale</span>
-        <span class="badge confirmed">Confirmed</span>
-      </div>
-      <h3>+199 Elo From 6× More Positions: The Bitter Lesson?</h3>
-      <p class="hyp-line">More data beat more parameters <em>and</em> a stronger teacher. The two confirmed levers (search, data) are both "more compute"; the rejected lever was "smarter network".</p>
-      <div class="result-row">
-        <div class="stat"><span class="label">5M positions</span><span class="value">1,810</span></div>
-        <div class="stat"><span class="label">30M positions</span><span class="value">2,009</span></div>
-        <div class="stat"><span class="label">delta</span><span class="value">+199</span></div>
-      </div>
-      <p class="card-link"><a href="{{ "/experiments/#data" | relURL }}">→ Read the data-scale ablation</a></p>
-    </article>
-
+  <div class="section-heading"><div><p class="hero-kicker">02 / the experiments</p><h2>What changed the results?</h2></div><a href="{{ "/experiments/" | relURL }}">All experiments →</a></div>
+  <div class="home-steps experiment-cards">
+    <article><span>Search budget</span><h3>1,807 → 2,084</h3><p>On the baseline checkpoint, increasing inference-time search from 800 to 4,000 simulations raised the recorded Elo estimate.</p><a href="{{ "/experiments/#search" | relURL }}">Search ablation →</a></article>
+    <article><span>Training data</span><h3>1,810 → 2,009</h3><p>The published data-scale comparison increased training positions from 5 million to 30 million.</p><a href="{{ "/experiments/#data" | relURL }}">Data ablation →</a></article>
+    <article><span>Network capacity</span><h3>20 → 40 blocks</h3><p>Doubling depth at the 5-million-position setting did not improve the reported headline estimate.</p><a href="{{ "/experiments/#capacity" | relURL }}">Capacity ablation →</a></article>
   </div>
-
-  <p class="cluster-links">
-    <a href="{{ "/experiments/" | relURL }}">→ All experiments, with charts and CIs</a>
-    <a href="{{ "/experiments/#soft-vs-hard" | relURL }}">→ Soft vs hard targets</a>
-    <a href="{{ "/experiments/#stacking" | relURL }}">→ Stacking search + data together</a>
-  </p>
+  <p class="dim">These summaries belong to different experiments. Each linked write-up records its setup, measurements and limitations.</p>
 </section>
-
-<section class="vs-az">
-  <div class="coord rv">c3 &middot; vs alphazero</div>
-  <h2 class="rv">vs AZ</h2>
-  <table class="compact">
-    <thead>
-      <tr><th></th><th>AlphaZero (2017)</th><th>This Project</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>approach</td><td>tabula-rasa self-play RL</td><td>supervised distillation from stockfish</td></tr>
-      <tr><td>network</td><td>20 blocks × 256 ch</td><td><strong>identical</strong></td></tr>
-      <tr><td>training compute</td><td>~45,000 TPU-v1-hr + 576 TPU-v2-hr</td><td>~16 GPU-hours (single L40S)</td></tr>
-      <tr><td>training data</td><td>~3.5 B positions</td><td>5M–30M positions</td></tr>
-      <tr><td>peak elo</td><td>~3,500</td><td>2,301 (R2 v2 ep 14, lower-CI bound 2,190 clears 2,300) · 2,285 (ep 4) · 2,209 (R1 v2 ep 7)</td></tr>
-    </tbody>
-  </table>
-  <p><a href="{{ "/vs-alphazero/" | relURL }}">→ Full comparison and what's literally identical</a></p>
-</section>
-
-<section class="results-matrix">
-  <div class="coord rv">d4 &middot; every checkpoint</div>
-  <h2 class="rv">Results Matrix</h2>
-  <p class="lede">Every checkpoint we trained, at the standard 800-sim eval. <em>UCI=1,350</em> anchor: the only one every checkpoint has been measured against, so the comparison is apples-to-apples across runs. Bold marks the canonical run's best epoch.</p>
-
-  <table class="compact matrix">
-    <thead>
-      <tr><th>Run</th><th>ep 5</th><th>ep 10</th><th>ep 15</th><th>ep 20</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>d15 5M baseline (20×256)</td><td>1,651</td><td>1,862</td><td>1,759</td><td><strong>1,807</strong></td></tr>
-      <tr><td>d15 5M capacity (40×256)</td><td>1,851</td><td>1,851</td><td>1,759</td><td>1,820</td></tr>
-      <tr><td>d10 5M subset (20×256)</td><td>1,749</td><td>1,770</td><td>1,688</td><td>1,730</td></tr>
-      <tr><td>d10 30M full (20×256)</td><td><strong>2,084</strong></td><td>1,961</td><td>1,888</td><td>1,961</td></tr>
-      <tr><td>d15 46M R1 v1 (40×256, const LR)</td><td>1,933</td><td>2,033</td><td>–</td><td>–</td></tr>
-      <tr><td>d15 46M R2 v1 (20×256, const LR, lowlr)</td><td>1,933</td><td>1,933</td><td>–</td><td>1,933 (ep 29 final)</td></tr>
-      <tr><td><strong>d15 46M R1 v2 (40×256, cosine, killed at ep 15)</strong></td><td>2,033</td><td>2,033</td><td>–</td><td>–</td></tr>
-      <tr><td><strong>d15 46M R2 v2 (20×256, cosine, killed at ep 22)</strong></td><td>1,933</td><td>1,933</td><td><strong>2,276</strong> (ep 14)</td><td>–</td></tr>
-    </tbody>
-  </table>
-
-  <p class="dim">100-game evals at UCI=1,350. CI is ~±100 Elo per cell; the variation epoch-to-epoch within a run (e.g. baseline 10 = 1,862) is mostly noise, not real swing. The cross-run comparisons (5M baseline → 5M capacity → 30M data) are larger than the noise.</p>
-
-  <h3 class="sub">Deep-Search Results</h3>
-  <p>Same checkpoints, more MCTS sims at inference. Numbers in <code>[ ]</code> are 95% CIs.</p>
-  <table class="compact matrix">
-    <thead>
-      <tr><th>Checkpoint</th><th>sims</th><th>opponent</th><th>Elo</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>d15 baseline ep 20</td><td>800</td><td>UCI=1,350</td><td>1,807</td></tr>
-      <tr><td>d15 baseline ep 20</td><td>4,000</td><td>UCI=1,350</td><td>2,084</td></tr>
-      <tr><td>d10 30M ep 5</td><td>800</td><td>UCI=1,800</td><td>2,004</td></tr>
-      <tr><td>d10 30M ep 5</td><td>2,000</td><td>UCI=1,800</td><td>2,034</td></tr>
-      <tr><td>d10 30M ep 5</td><td>4,000</td><td>UCI=1,800</td><td>2,084 [2005, 2197]</td></tr>
-      <tr><td>d10 30M ep 5</td><td>4,000</td><td>UCI=2,000</td><td>2,110 [2044, 2187]</td></tr>
-      <tr><td>d10 30M ep 10</td><td>4,000</td><td>UCI=1,800</td><td>2,171 [2082, 2324]</td></tr>
-      <tr><td>d10 30M ep 15</td><td>4,000</td><td>UCI=1,800</td><td>2,189 [2098, 2354]</td></tr>
-      <tr><td>d10 30M ep 20</td><td>4,000</td><td>UCI=1,800</td><td>2,154 [2067, 2297]</td></tr>
-      <tr><td>d15 46M R1 const-LR ep 7</td><td>4,000</td><td>UCI=1,800</td><td>2,146 [2060, 2285]</td></tr>
-      <tr><td>d15 46M R1 v2 cosine ep 2</td><td>4,000</td><td>UCI=1,800</td><td>2,138 [2054, 2274]</td></tr>
-      <tr><td><strong>d15 46M R1 v2 cosine ep 7</strong></td><td><strong>4,000</strong></td><td><strong>UCI=1,800</strong></td><td><strong>2,209 [2115, 2389]</strong></td></tr>
-      <tr><td><strong>d15 46M R2 v2 cosine ep 4</strong></td><td><strong>4,000</strong></td><td><strong>UCI=1,800</strong></td><td><strong>2,285 [2177, 2554]</strong></td></tr>
-      <tr><td><strong>d15 46M R2 v2 cosine ep 14</strong></td><td><strong>4,000</strong></td><td><strong>UCI=1,800</strong></td><td><strong>2,301 [2190, 2601]</strong> ← lower CI clears 2,300</td></tr>
-    </tbody>
-  </table>
-  <p class="dim">Highest point estimate: <strong>2,301 Elo</strong> at R2 v2 cosine ep 14, and uniquely, its 95% lower CI bound (2,190) clears the previous peak (d10 ep 15 = 2,189). The wider-CI ep 4 measurement (2,285) is consistent. R1 v2 cosine ep 7 at 2,209 is the 40×256 variant's best. The 4,000-sim deep-search numbers stack the two confirmed ablations (search + data) on one checkpoint; the cosine LR schedule on top recovered another ~+100 Elo over the constant-LR R1 v1 / R2 v1 runs.</p>
-</section>
-
-<section class="next">
-  <div class="coord rv">e5 &middot; what's next</div>
-  <h2 class="rv">What's Next</h2>
-  <p>The largest remaining gap to AlphaZero is that AZ has <em>no teacher</em>; its targets come from its own MCTS visit counts, not from Stockfish. The Lc0 recipe (<strong>distill first, RL second</strong>) runs an AlphaZero-style self-play loop on top of the distilled prior.</p>
-  <p class="dim">Self-play has been attempted six times on spot since 2026-05-25; every run was evicted before iteration 1 finished (iters take ~90 min, AZ eviction windows are shorter). The algorithm is fixed (LR=1e-5, no catastrophic forgetting); the binding constraint is moving the trainer off spot. <a href="{{ "/next/#selfplay-postmortem" | relURL }}">→ Self-play postmortem</a></p>
-  <p>The d15-46M cosine trainers (<strong>R1 v2</strong> and <strong>R2 v2</strong>) were killed at 2026-05-26 17:15 UTC after producing the top-2 ckpts in the deep-search table above. Late epochs at sims=800 were not trending up, and the autoeval daemon is offline; finishing them on OD would have been ~$320 with low chance of a new peak. <a href="{{ "/next/#d15-trainers-killed" | relURL }}">→ Why we stopped</a></p>
-  <p>Two cheap follow-up evals are in flight to confirm the ≥ 2,300 question: sims=8,000 vs UCI=2,000 on <strong>R2 v2 ep 4</strong> and sims=4,000 vs UCI=1,800 on <strong>R2 v2 ep 14</strong>.</p>
-  <p><a href="{{ "/next/" | relURL }}">→ Full status &amp; roadmap</a></p>
-</section>
-
-<section class="links">
-  <div class="coord rv">f6 &middot; elsewhere</div>
-  <h2 class="rv">More</h2>
+<section class="links home-explore">
+  <div class="section-heading"><div><p class="hero-kicker">03 / keep exploring</p><h2>Beyond the headline</h2></div></div>
   <div class="grid grid-3">
-    <a href="{{ "/experiments/" | relURL }}" class="card">
-      <span class="card-icon" aria-hidden="true">▦</span>
-      <h3>Experiments</h3>
-      <p>Four ablations · hypothesis prove/disprove · charts and CIs</p>
-    </a>
-    <a href="{{ "/method/" | relURL }}" class="card">
-      <span class="card-icon" aria-hidden="true">ƒ</span>
-      <h3>Method</h3>
-      <p>The loss · MCTS at inference · Elo bisection</p>
-    </a>
-    <a href="{{ "/failures/" | relURL }}" class="card">
-      <span class="card-icon" aria-hidden="true">✕</span>
-      <h3>Failures</h3>
-      <p>Every real bug we hit · dead ends · the fixes that stuck</p>
-    </a>
-    <a href="{{ "/infra/" | relURL }}" class="card">
-      <span class="card-icon" aria-hidden="true">▤</span>
-      <h3>Infrastructure</h3>
-      <p>EKS · bare-EC2 · multi-region · self-terminating runners</p>
-    </a>
-    <a href="{{ "/vs-alphazero/" | relURL }}" class="card">
-      <span class="card-icon" aria-hidden="true">♛</span>
-      <h3>vs AZ</h3>
-      <p>Same network · different recipe · 10,000× less compute</p>
-    </a>
-    <a href="{{ "/vs-leela/" | relURL }}" class="card">
-      <span class="card-icon" aria-hidden="true">♜</span>
-      <h3>vs Leela</h3>
-      <p>Distill-then-RL · we ran 7 attempts · loop runs, ~10⁵× less compute kills it</p>
-    </a>
-    <a href="{{ "/vs-muzero/" | relURL }}" class="card">
-      <span class="card-icon" aria-hidden="true">♝</span>
-      <h3>vs MuZero</h3>
-      <p>Learned-model MCTS vs known-rules MCTS · we kept the rules engine</p>
-    </a>
-    <a href="{{ "/go/" | relURL }}" class="card">
-      <span class="card-icon" aria-hidden="true">●</span>
-      <h3>Go (9×9)</h3>
-      <p>8×128 ResNet · distill from KataGo · parity at v200 in 15 epochs</p>
-    </a>
-    <a href="{{ "/next/" | relURL }}" class="card">
-      <span class="card-icon" aria-hidden="true">→</span>
-      <h3>What's Next</h3>
-      <p>Self-play loop · more d15 data · roadmap</p>
-    </a>
-    <a href="https://github.com/shehio/world-models#readme" class="card">
-      <span class="card-icon" aria-hidden="true">▶</span>
-      <h3>Reproduce</h3>
-      <p>Clone · run an eval yourself · dockerfiles included</p>
-    </a>
-    <a href="https://github.com/shehio/world-models" class="card">
-      <span class="card-icon" aria-hidden="true">◈</span>
-      <h3>GitHub</h3>
-      <p>Source · 253 tests · launchers · CI</p>
-    </a>
-    <a href="https://shehabyasser.com" class="card">
-      <span class="card-icon" aria-hidden="true">♞</span>
-      <h3>Shehab Yasser</h3>
-      <p>The author · more projects &amp; writing</p>
-    </a>
+    <a class="card" href="{{ "/vs-alphazero/" | relURL }}"><h3>AlphaZero</h3><p>Related network architecture, different training signal and compute budget.</p></a>
+    <a class="card" href="{{ "/vs-leela/" | relURL }}"><h3>Self-play &amp; Leela</h3><p>What happened when self-play followed supervised distillation.</p></a>
+    <a class="card" href="{{ "/vs-muzero/" | relURL }}"><h3>MuZero</h3><p>Compare search with a learned model to search with known game rules.</p></a>
+    <a class="card" href="{{ "/go/" | relURL }}"><h3>Go, 9 × 9</h3><p>A second game, with KataGo as the teacher and a smaller network.</p></a>
+    <a class="card" href="{{ "/failures/" | relURL }}"><h3>Negative results</h3><p>Failed hypotheses, implementation bugs and what changed afterward.</p></a>
+    <a class="card" href="{{ "/next/" | relURL }}"><h3>Research log</h3><p>Dated experiments, follow-up evaluations and open questions.</p></a>
   </div>
 </section>
 {{ end }}
