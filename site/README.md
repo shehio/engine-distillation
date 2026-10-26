@@ -5,7 +5,7 @@ Dark monochromatic, JetBrains Mono, teal accent. Inspired by
 but redesigned around a single richer home page + four focused
 detail pages, with inline SVG diagrams instead of a card-only grid.
 
-Deployed to **https://shehio.github.io/world-models/** via the
+Deployed to **https://shehio.github.io/engine-distillation/** via the
 `.github/workflows/site.yml` workflow on every push that touches
 `site/`.
 
@@ -63,7 +63,7 @@ site/
 ```bash
 brew install hugo
 cd site
-hugo server         # http://localhost:1313/world-models/
+hugo server         # http://localhost:1313/engine-distillation/
 ```
 
 Production build (what the workflow does):

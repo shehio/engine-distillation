@@ -71,7 +71,7 @@ L10 ≈ 1,800**; treat the absolute number as anchor-dependent. The lower
 *bound* (KataGo @v=200 beats GnuGo by ≥ 566 Elo) is robust regardless of
 the anchor.
 
-→ launcher: [`infra-eks/launchers/calibrate-katago-vs-gnugo.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/calibrate-katago-vs-gnugo.sh) ·
+→ launcher: [`infra-eks/launchers/calibrate-katago-vs-gnugo.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/calibrate-katago-vs-gnugo.sh) ·
 result: `s3://wm-chess-library-594561963943/go-calibration/katago-v200-vs-gnugo-l10-20260526T1821Z.txt`
 
 ## What's the Setup
@@ -126,7 +126,7 @@ If we want significantly more Elo from this agent, the lever isn't
 
 The 250K-positions MPS chess distillation famously **regressed**
 to the small-network baseline because of soft-target dilution
-([results.md §3](https://github.com/shehio/world-models/blob/main/experiments/distill-soft/results.md)).
+([results.md §3](https://github.com/shehio/engine-distillation/blob/main/experiments/distill-soft/results.md)).
 Go *did not* regress, went from −325 to 0 cleanly. The difference:
 
 - Go uses 8 multipv at the KataGo teacher's softmax, but Go's
@@ -155,8 +155,8 @@ Going beyond requires self-play (the [next-step](/next/)).
 
 ## Code
 
-- [`experiments/distill-go/`](https://github.com/shehio/world-models/tree/main/experiments/distill-go): datagen, training, eval
-- [`infra-eks/launchers/eval-go-9x9-8x128.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/eval-go-9x9-8x128.sh): EC2 eval launcher (used for all the v200 numbers above)
+- [`experiments/distill-go/`](https://github.com/shehio/engine-distillation/tree/main/experiments/distill-go): datagen, training, eval
+- [`infra-eks/launchers/eval-go-9x9-8x128.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/eval-go-9x9-8x128.sh): EC2 eval launcher (used for all the v200 numbers above)
 - Checkpoints in S3:
   `s3://wm-chess-library-594561963943/go-9x9-mpv8-gpu-v400-20260521T1230Z/checkpoints/9x9-8x128-20260522T0625Z/`
 

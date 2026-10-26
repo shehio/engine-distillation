@@ -17,8 +17,8 @@ Schrittwieser et al. 2019. Board encoding (19 planes), the 8×8×73 move
 encoding, and the eval arena all come from `wm_chess`.
 
 Narrative + comparison to the distillation results:
-[vs MuZero](https://shehio.github.io/world-models/vs-muzero/) ·
-[negative-results postmortem](https://shehio.github.io/world-models/experiments/#selfplay-muzero-negative).
+[vs MuZero](https://shehio.github.io/engine-distillation/vs-muzero/) ·
+[negative-results postmortem](https://shehio.github.io/engine-distillation/experiments/#selfplay-muzero-negative).
 
 ## Two modes
 
@@ -47,7 +47,7 @@ POV, negamax-style). Levers added while chasing the rest of the gap:
 `latent_loss_weight` / `pred_loss_weight`, paper-faithful
 `dynamics_grad_scale=0.5`, and `g_output_relu` (keep g's latents on the
 teacher trunk's post-ReLU manifold). See the
-[postmortem](https://shehio.github.io/world-models/experiments/#selfplay-muzero-negative)
+[postmortem](https://shehio.github.io/engine-distillation/experiments/#selfplay-muzero-negative)
 for the full story.
 
 ## Layout

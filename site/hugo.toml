@@ -1,8 +1,8 @@
-baseURL = "https://shehio.github.io/world-models/"
+baseURL = "https://shehio.github.io/engine-distillation/"
 languageCode = "en-us"
-title = "world-models: Stockfish distilled into AlphaZero's network"
+title = "engine-distillation: Stockfish distilled into AlphaZero's network"
 # Rewrite absolute URLs in content (e.g. /baseline/) so they pick up the
-# /world-models/ subpath when deployed to project Pages.
+# /engine-distillation/ subpath when deployed to project Pages.
 canonifyURLs = true
 
 [params]

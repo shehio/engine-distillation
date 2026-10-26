@@ -1,5 +1,5 @@
 ---
-title: "World Models: Chess"
+title: "Engine Distillation: Chess"
 ---
 
 (home: content lives in the layouts/index.html template; this file just
