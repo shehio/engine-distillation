@@ -30,7 +30,7 @@ positions is meaningfully stronger than the 4×64 spike on 5K
 positions. Most of the gain is the bigger network's capacity to
 fit the larger dataset.
 
-→ launcher: [`infra-eks/launchers/eval-go-9x9-8x128.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/eval-go-9x9-8x128.sh)
+→ launcher: [`infra-eks/launchers/eval-go-9x9-8x128.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/eval-go-9x9-8x128.sh)
 → checkpoints: `s3://wm-chess-library-594561963943/go-9x9-mpv8-gpu-v400-20260521T1230Z/checkpoints/9x9-8x128-20260522T0625Z/`
 
 ---

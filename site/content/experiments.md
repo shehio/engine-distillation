@@ -43,8 +43,8 @@ training checkpoint, not because it's deterministically best. Loss
 plateaus around 2.59 by epoch 10; top-1 accuracy plateaus ~0.34. This
 is the "1,800 ceiling" the ablations probe.
 
-→ code: [`train_supervised.py`](https://github.com/shehio/world-models/blob/main/experiments/distill-soft/src/distill_soft/train_supervised.py) ·
-[`eval.py`](https://github.com/shehio/world-models/blob/main/experiments/distill-soft/scripts/eval.py)
+→ code: [`train_supervised.py`](https://github.com/shehio/engine-distillation/blob/main/experiments/distill-soft/src/distill_soft/train_supervised.py) ·
+[`eval.py`](https://github.com/shehio/engine-distillation/blob/main/experiments/distill-soft/scripts/eval.py)
 
 ## Network Capacity: Doubling Depth Didn't Help {#capacity}
 
@@ -78,7 +78,7 @@ is already in the over-parameterized regime. Top-1 was already 0.34
 with the smaller net and stays 0.34 with the bigger one. The student
 is hitting a *teacher-signal* limit, not a *representation* limit.
 
-→ code: [`d15-40x256-eu.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/d15-40x256-eu.sh)
+→ code: [`d15-40x256-eu.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/d15-40x256-eu.sh)
 
 ## Soft vs Hard Targets {#soft-vs-hard}
 
@@ -120,7 +120,7 @@ soft targets. A sharper temperature (e.g. `T = 0.3`) is on the roadmap;
 it would keep some multipv ranking information but force more
 commitment from the student.
 
-→ code: [`stockfish_data.py`](https://github.com/shehio/world-models/blob/main/experiments/distill-soft/src/distill_soft/stockfish_data.py)
+→ code: [`stockfish_data.py`](https://github.com/shehio/engine-distillation/blob/main/experiments/distill-soft/src/distill_soft/stockfish_data.py)
 (the `softmax(cp/100*T)` construction)
 
 ## Eval-Side Search: +277 Elo From Search Alone {#search}
@@ -164,11 +164,11 @@ AlphaZero, the relevant number is the search-saturated one.
 A full sims sweep is in progress: same checkpoint, eval at
 200 / 800 / 2,000 / 4,000 / 8,000 / 16,000 sims. The Elo-vs-log(sims)
 curve will reveal the saturation point. The machinery
-([`elo_bisect.py`](https://github.com/shehio/world-models/blob/main/experiments/distill-soft/scripts/elo_bisect.py))
+([`elo_bisect.py`](https://github.com/shehio/engine-distillation/blob/main/experiments/distill-soft/scripts/elo_bisect.py))
 is in place.
 
-→ code: [`eval-deep-sims.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/eval-deep-sims.sh) ·
-[`eval-c-ep5-sims4000.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/eval-c-ep5-sims4000.sh)
+→ code: [`eval-deep-sims.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/eval-deep-sims.sh) ·
+[`eval-c-ep5-sims4000.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/eval-c-ep5-sims4000.sh)
 
 ## Data Scale: 6× More Positions (The Bitter Lesson?) {#data}
 
@@ -241,8 +241,8 @@ The two confirmed levers are both forms of "more compute"; the
 rejected lever is the "smarter network" intuition. The bitter
 lesson, replayed at $50 budget on a single GPU.
 
-→ code: [`d10-full30m.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/d10-full30m.sh) ·
-[`stockfish_data.py`](https://github.com/shehio/world-models/blob/main/experiments/distill-soft/src/distill_soft/stockfish_data.py)
+→ code: [`d10-full30m.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/d10-full30m.sh) ·
+[`stockfish_data.py`](https://github.com/shehio/engine-distillation/blob/main/experiments/distill-soft/src/distill_soft/stockfish_data.py)
 
 ## Stacking Search + Data Scale Together {#stacking}
 
@@ -268,8 +268,8 @@ the tightest CI sits at 2,110 against the stronger UCI=2,000 opponent.
 The curve peaks at ep 15 and dips slightly by ep 20; the model is
 already past its optimum at the 20×256 / 30M scale.
 
-→ code: [`eval-c-ep5-sims4000.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/eval-c-ep5-sims4000.sh) ·
-[`eval-c-ep5-sims2000-uci1800.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/eval-c-ep5-sims2000-uci1800.sh)
+→ code: [`eval-c-ep5-sims4000.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/eval-c-ep5-sims4000.sh) ·
+[`eval-c-ep5-sims2000-uci1800.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/eval-c-ep5-sims2000-uci1800.sh)
 
 ## Stronger Teacher at Full Data Scale: d15 at 46M {#d15-46m}
 
@@ -359,7 +359,7 @@ indistinguishable from R1 v1's despite half the per-epoch compute.
 ### sims=4,000 deep-read: v1 (constant LR)
 
 A second daemon
-([`wm-deep-eval-daemon.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/daemons/wm-deep-eval-daemon.sh))
+([`wm-deep-eval-daemon.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/daemons/wm-deep-eval-daemon.sh))
 fires sims=4,000 follow-ups on any ckpt whose sims=800 score crosses
 threshold (started at 1,940; dropped to 1,920 to catch R2 v1 ckpts).
 
@@ -399,8 +399,8 @@ Every single game drew. The Stockfish-anchored "gap" was noise.
 indistinguishable.** The d15 teacher at constant LR didn't give us
 strength beyond d10's ceiling, but it also didn't underperform.
 
-→ code: [`h2h-d10-vs-d15.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/h2h-d10-vs-d15.sh) ·
-[`h2h_mp.py`](https://github.com/shehio/world-models/blob/main/experiments/selfplay/scripts/h2h_mp.py)
+→ code: [`h2h-d10-vs-d15.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/h2h-d10-vs-d15.sh) ·
+[`h2h_mp.py`](https://github.com/shehio/engine-distillation/blob/main/experiments/selfplay/scripts/h2h_mp.py)
 
 ### sims=800 trajectory: v2 (cosine LR) (UCI=1,800 anchor)
 
@@ -475,7 +475,7 @@ The ep 4 estimate (2,285) is compatible with it; R1 v2 ep 7 (2,209) has a lower
 point estimate. These overlapping intervals do not establish a firm ordering. A 200-game
 head-to-head among the three top ckpts would tighten the ordering
 further; see
-[`h2h-d10-vs-d15.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/h2h-d10-vs-d15.sh)
+[`h2h-d10-vs-d15.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/h2h-d10-vs-d15.sh)
 for the launcher template.
 
 **Both follow-up evals landed**, two cheap evals designed to confirm
@@ -489,11 +489,11 @@ whether the project had actually crossed 2,300 Elo:
 R1 v2 and R2 v2 trainers were killed at 17:15 UTC; see
 [#cosine-killed](#cosine-killed) above for the rationale.
 
-→ code: [`d15-full30m.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/d15-full30m.sh) ·
-[`d15-20x256-lowlr.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/d15-20x256-lowlr.sh) ·
-[`eval-r2v2-ep4-sims8000-uci2000.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/eval-r2v2-ep4-sims8000-uci2000.sh) ·
-[`eval-r2v2-ep14-sims4000.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/launchers/eval-r2v2-ep14-sims4000.sh) ·
-[`wm-deep-eval-daemon.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/daemons/wm-deep-eval-daemon.sh)
+→ code: [`d15-full30m.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/d15-full30m.sh) ·
+[`d15-20x256-lowlr.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/d15-20x256-lowlr.sh) ·
+[`eval-r2v2-ep4-sims8000-uci2000.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/eval-r2v2-ep4-sims8000-uci2000.sh) ·
+[`eval-r2v2-ep14-sims4000.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/launchers/eval-r2v2-ep14-sims4000.sh) ·
+[`wm-deep-eval-daemon.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/daemons/wm-deep-eval-daemon.sh)
 
 ## Peak Elo Across Every Checkpoint We've Ever Run {#peak-elo}
 
@@ -556,7 +556,7 @@ real ordering. The launcher exists; see below.
   The d10 baseline added +105 Elo between ep 5 and ep 15; if R1 v2
   does anything similar, the peak is still ahead of us.
 - **Soft-target dilution** at d15 is still a plausible micro-loss
-  ([details](https://github.com/shehio/world-models/blob/main/experiments/distill-soft/results.md#three-honest-hypotheses-for-the-underperformance))
+  ([details](https://github.com/shehio/engine-distillation/blob/main/experiments/distill-soft/results.md#three-honest-hypotheses-for-the-underperformance))
   but it's no longer the dominant story: the cosine schedule
   recovered most of what the constant LR was losing.
 
@@ -576,7 +576,7 @@ each), 104 games, alternating colors. Result lands at
 Override `CKPT_B_S3=...` and `NB_B/NF_B` env vars to re-run against d15's
 actual peak when training completes.
 
-Underlying script: [`experiments/selfplay/scripts/h2h_mp.py`](https://github.com/shehio/world-models/blob/main/experiments/selfplay/scripts/h2h_mp.py)
+Underlying script: [`experiments/selfplay/scripts/h2h_mp.py`](https://github.com/shehio/engine-distillation/blob/main/experiments/selfplay/scripts/h2h_mp.py)
 (extended with per-agent `--n-blocks-a/--n-blocks-b` so 20×256 and
 40×256 can play each other).
 

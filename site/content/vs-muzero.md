@@ -102,7 +102,7 @@ We don't have any of that. Our network outputs a per-position policy
 and a single scalar value; that's it. KataGo's paper documented ~9×
 efficiency gains over vanilla AlphaZero from adding aux heads of
 exactly this flavor ([see vs-Lc0 page](/vs-leela/)).
-[We've plumbed the architecture](https://github.com/shehio/world-models/blob/main/experiments/distill-go/src/distill_go/network.py)
+[We've plumbed the architecture](https://github.com/shehio/engine-distillation/blob/main/experiments/distill-go/src/distill_go/network.py)
 for KataGo-style aux heads on the Go side but haven't enabled them in
 a real run yet.
 

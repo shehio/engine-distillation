@@ -24,7 +24,7 @@ pipeline with rules-aware MCTS, training, and an Elo gauntlet.
   0 [−122, +122]) and stayed there. Anchored through GnuGo L10,
   that puts the student at **≥ 2,366 absolute Go Elo** on the
   GnuGo-anchored scale (anchor caveats on the
-  [site's Go page](https://shehio.github.io/world-models/go/)).
+  [site's Go page](https://shehio.github.io/engine-distillation/go/)).
 - **Self-play on top of the prior (`scripts/selfplay_loop.py`).** Run
   `20260526T1947Z`: 103 ungated iterations seeded from the
   KataGo-parity teacher — the project's first completed multi-iteration

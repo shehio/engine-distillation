@@ -103,7 +103,7 @@ problem the bisection solves.
 
 Three to four probes converge to ±50 Elo precision in roughly 30–40
 minutes on a g6.4xlarge. Implementation at
-[`experiments/distill-soft/scripts/elo_bisect.py`](https://github.com/shehio/world-models/blob/main/experiments/distill-soft/scripts/elo_bisect.py),
+[`experiments/distill-soft/scripts/elo_bisect.py`](https://github.com/shehio/engine-distillation/blob/main/experiments/distill-soft/scripts/elo_bisect.py),
 covered by 13 unit tests for the Elo math, bracket halving, stop
 conditions, and end-to-end convergence on synthetic agents at 1,400 /
 1,800 / 2,400 Elo.
@@ -113,7 +113,7 @@ conditions, and end-to-end convergence on synthetic agents at 1,400 /
 Before bisection we used a simpler protocol: play 100 games at each of
 two fixed `UCI_Elo` anchors (1,350 and 1,800) and report both
 absolute Elos. This is what the [auto-eval
-daemon](https://github.com/shehio/world-models/blob/main/infra-eks/daemons/wm-autoeval-daemon.sh)
+daemon](https://github.com/shehio/engine-distillation/blob/main/infra-eks/daemons/wm-autoeval-daemon.sh)
 still runs on every new checkpoint: fast, comparable across the
 whole training run, but the Elo CI can be wide when the score is far
 from 0.5. The bisection is the authoritative number for milestones.

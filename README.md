@@ -1,10 +1,10 @@
-# world-models: Stockfish distilled into AlphaZero's network
+# engine-distillation: Stockfish distilled into AlphaZero's network
 
-**Chess**: [2,301 Elo](https://shehio.github.io/world-models/experiments/#peak-elo)
+**Chess**: [2,301 Elo](https://shehio.github.io/engine-distillation/experiments/#peak-elo)
 (R2 v2 ep 14 vs Stockfish UCI=1,800, sims=4,000, 95% CI [2,190, 2,601])
 distilled from Stockfish on ~46M positions. Tighter-CI second-place:
 2,153 Elo at sims=8,000 vs UCI=2,000 (CI ±70).
-**Go (9×9)**: [≥ 2,366](https://shehio.github.io/world-models/go/)
+**Go (9×9)**: [≥ 2,366](https://shehio.github.io/engine-distillation/go/)
 (parity with KataGo @v=200, anchored to GnuGo L10) from 1.236M
 KataGo-labeled positions. Both on **one L40S GPU per training run,
 ~16 GPU-hours each** — roughly three-to-four orders of magnitude less
@@ -12,7 +12,7 @@ compute than the AlphaZero training run (~10³× by device-hours, ~10⁴×
 by FLOPs).
 
 Live narrative + method + ablations + self-play postmortems on the
-site: **[shehio.github.io/world-models](https://shehio.github.io/world-models/)**.
+site: **[shehio.github.io/engine-distillation](https://shehio.github.io/engine-distillation/)**.
 
 ## What's in here
 
@@ -20,10 +20,10 @@ site: **[shehio.github.io/world-models](https://shehio.github.io/world-models/)*
 |---|---|---|
 | Chess · soft distillation | [`experiments/distill-soft/`](./experiments/distill-soft/) | **2,301 Elo** vs UCI=1,800 at sims=4,000 — R2 v2 ep 14, 95% CI [2,190, 2,601] |
 | Chess · hard distillation | [`experiments/distill-hard/`](./experiments/distill-hard/) | ~1,185 Elo · soft-vs-hard ablation comparison point |
-| Chess · self-play RL | [`experiments/selfplay/`](./experiments/selfplay/) | Faithful AlphaZero v1–v4 (+368 Elo vs random); from the distilled teacher, ungated **regresses ~370 Elo**, gated **holds but doesn't climb** ([postmortem](https://shehio.github.io/world-models/next/#selfplay-postmortem)) |
+| Chess · self-play RL | [`experiments/selfplay/`](./experiments/selfplay/) | Faithful AlphaZero v1–v4 (+368 Elo vs random); from the distilled teacher, ungated **regresses ~370 Elo**, gated **holds but doesn't climb** ([postmortem](https://shehio.github.io/engine-distillation/next/#selfplay-postmortem)) |
 | Go (9×9) · distillation | [`experiments/distill-go/`](./experiments/distill-go/) | **≥ 2,366 Go Elo** (anchored to GnuGo L10) · 8×128 net on 1.236M KataGo-labeled positions |
 | Go (9×9) · self-play RL | [`experiments/distill-go/scripts/selfplay_loop.py`](./experiments/distill-go/scripts/selfplay_loop.py) | First completed multi-iter self-play in the project · iter 42 H2H vs prior = 21W/19L (Elo Δ +17 ± 100, no improvement) |
-| Chess · MuZero (learned dynamics) | [`experiments/muzero-chess/`](./experiments/muzero-chess/) | Negative result at 1-GPU compute: from-scratch caps ~700–900 Elo; distill-init ~1,700 after the MCTS sign-bug fix ([postmortem](https://shehio.github.io/world-models/next/#selfplay-gated-final)) |
+| Chess · MuZero (learned dynamics) | [`experiments/muzero-chess/`](./experiments/muzero-chess/) | Negative result at 1-GPU compute: from-scratch caps ~700–900 Elo; distill-init ~1,700 after the MCTS sign-bug fix ([postmortem](https://shehio.github.io/engine-distillation/next/#selfplay-gated-final)) |
 
 All six share `wm_chess/` (board, network, MCTS, arena, catalog,
 merge tools), the same on-disk `.npz` schema, and the same datagen +
@@ -83,8 +83,8 @@ single experiment on a bare EC2 box; the EKS Indexed Jobs in
 |---|---|---|
 | Chess · best point estimate | **2,301 Elo** (CI [2,190, 2,601]) | R2 v2 ep 14, sims=4,000, vs UCI=1,800 |
 | Chess · tightest-CI measurement | 2,153 Elo (CI [2,084, 2,235]) | R2 v2 ep 4, sims=8,000, vs UCI=2,000 |
-| Chess · self-play improvement so far | none — ungated (attempt #7) regressed to ~1,730; gated holds the teacher's ~2,101 with no candidate promoted | [postmortem](https://shehio.github.io/world-models/next/#selfplay-postmortem) |
-| Go · 9×9 distillation lower-bound Elo | **≥ 2,366** (Go-Elo, GnuGo-anchored — *not* the AlphaGo-paper scale; [caveat](https://shehio.github.io/world-models/go/)) | 8×128 ep 15 = parity with KataGo @v200, anchored to GnuGo L10 |
+| Chess · self-play improvement so far | none — ungated (attempt #7) regressed to ~1,730; gated holds the teacher's ~2,101 with no candidate promoted | [postmortem](https://shehio.github.io/engine-distillation/next/#selfplay-postmortem) |
+| Go · 9×9 distillation lower-bound Elo | **≥ 2,366** (Go-Elo, GnuGo-anchored — *not* the AlphaGo-paper scale; [caveat](https://shehio.github.io/engine-distillation/go/)) | 8×128 ep 15 = parity with KataGo @v200, anchored to GnuGo L10 |
 | Go · self-play improvement | +17 ± 100 Elo over prior at iter 42 (24h, one L4 GPU) | h2h, 40 games, alternating colors |
 
 ## Tests + CI
@@ -112,4 +112,4 @@ two stay in sync by construction.
 - Wu, [*Accelerating Self-Play Learning in Go (KataGo)*](https://arxiv.org/abs/1902.10565) (2019)
 - [Leela Chess Zero](https://lczero.org) — self-play AlphaZero engine; the prior-plus-self-play idea this project adapts (we build the prior by distilling Stockfish, not by self-play)
 
-Comparison pages on the site: [vs AlphaZero](https://shehio.github.io/world-models/vs-alphazero/) · [vs Lc0](https://shehio.github.io/world-models/vs-leela/) · [vs MuZero](https://shehio.github.io/world-models/vs-muzero/)
+Comparison pages on the site: [vs AlphaZero](https://shehio.github.io/engine-distillation/vs-alphazero/) · [vs Lc0](https://shehio.github.io/engine-distillation/vs-leela/) · [vs MuZero](https://shehio.github.io/engine-distillation/vs-muzero/)

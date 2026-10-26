@@ -69,7 +69,7 @@ def resolve(url: str, public: Path, base_path_prefix: str) -> Path | None:
     Returns the resolved Path if found, otherwise None."""
     parsed = urlparse(url)
     path = parsed.path
-    # Strip the baseURL path prefix (e.g. "/world-models") if present so
+    # Strip the baseURL path prefix (e.g. "/engine-distillation") if present so
     # we can map absolute Pages URLs back to public/ entries.
     if base_path_prefix and path.startswith(base_path_prefix):
         path = path[len(base_path_prefix):]
@@ -115,8 +115,8 @@ def main() -> int:
     ap.add_argument("--base-host", default="shehio.github.io",
                     help="Hostname treated as 'internal' for the link "
                          "check. Defaults to shehio.github.io.")
-    ap.add_argument("--base-path-prefix", default="/world-models",
-                    help="Path prefix on the baseURL (e.g. /world-models "
+    ap.add_argument("--base-path-prefix", default="/engine-distillation",
+                    help="Path prefix on the baseURL (e.g. /engine-distillation "
                          "for a project Pages site). Stripped before "
                          "looking up files. Empty for a root site.")
     args = ap.parse_args()

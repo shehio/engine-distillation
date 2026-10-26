@@ -11,14 +11,14 @@ Everything runs on AWS. The pipeline has three roles:
 1. **Datagen**: EKS Indexed Job, 8 spot-CPU pods × N games each.
    Each pod writes a shard to S3; a second Job merges shards into a
    single `data.npz`. Cluster spec:
-   [`cluster.yaml`](https://github.com/shehio/world-models/blob/main/infra-eks/cluster.yaml).
+   [`cluster.yaml`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/cluster.yaml).
 2. **Training**: EKS single-pod Job on a GPU node, or a bare-EC2
    self-terminating launcher when EKS can't get the instance type.
-   Cluster spec: [`cluster-train-us.yaml`](https://github.com/shehio/world-models/blob/main/infra-eks/cluster-train-us.yaml).
+   Cluster spec: [`cluster-train-us.yaml`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/cluster-train-us.yaml).
 3. **Eval + self-play**: per-checkpoint auto-eval EC2s
-   ([`daemons/wm-autoeval-daemon.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/daemons/wm-autoeval-daemon.sh)),
+   ([`daemons/wm-autoeval-daemon.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/daemons/wm-autoeval-daemon.sh)),
    and a self-play loop in its own EKS cluster
-   ([`cluster-selfplay-us.yaml`](https://github.com/shehio/world-models/blob/main/infra-eks/cluster-selfplay-us.yaml)).
+   ([`cluster-selfplay-us.yaml`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/cluster-selfplay-us.yaml)).
 
 Everything is committed and self-contained. Tear-down is one
 `eksctl delete cluster -f <spec>` per cluster.
@@ -88,7 +88,7 @@ launcher. Each script:
    so the EC2 self-deletes when the workload finishes.
 
 Catalog of existing launchers
-([`infra-eks/launchers/`](https://github.com/shehio/world-models/tree/main/infra-eks/launchers)):
+([`infra-eks/launchers/`](https://github.com/shehio/engine-distillation/tree/main/infra-eks/launchers)):
 
 | script | what |
 |---|---|

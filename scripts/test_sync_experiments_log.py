@@ -132,7 +132,7 @@ def test_transform_preserves_external_github_urls():
     out = transform(src_text)
     # The source has many launcher/source links pointing at github.com — they
     # should survive the transform untouched.
-    assert "https://github.com/shehio/world-models" in out
+    assert "https://github.com/shehio/engine-distillation" in out
 
 
 def test_transform_emits_autogen_header():

@@ -57,12 +57,12 @@ def test_is_internal_relative_paths():
 
 
 def test_is_internal_same_host_https():
-    assert is_internal("https://shehio.github.io/world-models/findings/",
+    assert is_internal("https://shehio.github.io/engine-distillation/findings/",
                        "shehio.github.io") is True
 
 
 def test_is_internal_other_host():
-    assert is_internal("https://github.com/shehio/world-models",
+    assert is_internal("https://github.com/shehio/engine-distillation",
                        "shehio.github.io") is False
 
 
@@ -125,11 +125,11 @@ def test_resolve_asset_file(fake_site):
 
 def test_resolve_strips_base_path_prefix(fake_site):
     """Hugo with canonifyURLs emits the full
-    https://shehio.github.io/world-models/findings/. After is_internal
-    accepts it, resolve must strip the /world-models prefix and find
+    https://shehio.github.io/engine-distillation/findings/. After is_internal
+    accepts it, resolve must strip the /engine-distillation prefix and find
     /findings/."""
-    assert resolve("/world-models/findings/", fake_site, "/world-models") is not None
-    assert resolve("/world-models/", fake_site, "/world-models") is not None
+    assert resolve("/engine-distillation/findings/", fake_site, "/engine-distillation") is not None
+    assert resolve("/engine-distillation/", fake_site, "/engine-distillation") is not None
 
 
 def test_resolve_missing_returns_none(fake_site):
@@ -193,15 +193,15 @@ def test_check_site_treats_same_host_as_internal(tmp_path):
     pub.mkdir()
     _write_page(
         pub, "index.html",
-        '<a href="https://shehio.github.io/world-models/findings/">F</a>'
-        '<a href="https://shehio.github.io/world-models/gone/">G</a>'
+        '<a href="https://shehio.github.io/engine-distillation/findings/">F</a>'
+        '<a href="https://shehio.github.io/engine-distillation/gone/">G</a>'
     )
     _write_page(pub, "findings/index.html", "F")
     broken = check_site(pub,
                         base_host="shehio.github.io",
-                        base_path_prefix="/world-models")
+                        base_path_prefix="/engine-distillation")
     assert list(broken.values()) == [
-        ["https://shehio.github.io/world-models/gone/"]
+        ["https://shehio.github.io/engine-distillation/gone/"]
     ]
 
 

@@ -66,9 +66,9 @@ in at 1,643. That's **~−350 Elo from the prior in 200 SGD steps**:
 the canonical catastrophic-forgetting signature.
 
 Fix: commit
-[`5c7cc65`](https://github.com/shehio/world-models/commit/5c7cc65)
+[`5c7cc65`](https://github.com/shehio/engine-distillation/commit/5c7cc65)
 dropped the self-play default to LR=1e-5 (100× smaller). Commit
-[`ddbb6d7`](https://github.com/shehio/world-models/commit/ddbb6d7)
+[`ddbb6d7`](https://github.com/shehio/engine-distillation/commit/ddbb6d7)
 confirmed even LR=1e-4 was still too aggressive and reverted to 1e-5
 from a clean d10 ep 15 seed.
 
@@ -97,7 +97,7 @@ Why spot at all: the OD G/VT vCPU quota in us-east-1 was saturated by
 the deep-eval boxes (autoeval daemon fires per-ckpt evals on the same
 32-vCPU quota), so the only way to launch a long-running self-play
 trainer was to accept spot eviction risk. Commit
-[`266f082`](https://github.com/shehio/world-models/commit/266f082)
+[`266f082`](https://github.com/shehio/engine-distillation/commit/266f082)
 made that trade-off explicit.
 
 ### What needs to change for self-play to actually run
@@ -148,7 +148,7 @@ So the bottleneck was never the algorithm *or* the spot launcher: it's that
 scale** (~1.3k recorded samples/iter). This is the strongest confirmation yet
 of the project thesis: distillation ≫ self-play at fixed compute. Full
 write-up in
-[EXPERIMENTS_LOG.md](https://github.com/shehio/world-models/blob/main/EXPERIMENTS_LOG.md#selfplay-muzero-negative).
+[EXPERIMENTS_LOG.md](https://github.com/shehio/engine-distillation/blob/main/EXPERIMENTS_LOG.md#selfplay-muzero-negative).
 
 (Engineering footnote: one gated relaunch was lost to a mistaken
 "optimization" that moved the gate match onto CPU workers, ~2-3× slower for
@@ -204,11 +204,11 @@ orchestrator are all still in the repo and still correct; only the
 "works in practice" claim needs the postmortem.
 
 Job manifest:
-[`infra-eks/k8s/job-selfplay.yaml`](https://github.com/shehio/world-models/blob/main/infra-eks/k8s/job-selfplay.yaml).
+[`infra-eks/k8s/job-selfplay.yaml`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/k8s/job-selfplay.yaml).
 Entrypoint:
-[`infra-eks/entrypoint-selfplay.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/entrypoint-selfplay.sh).
+[`infra-eks/entrypoint-selfplay.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/entrypoint-selfplay.sh).
 Orchestrator:
-[`infra-eks/run-selfplay.sh`](https://github.com/shehio/world-models/blob/main/infra-eks/run-selfplay.sh).
+[`infra-eks/run-selfplay.sh`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/run-selfplay.sh).
 
 ## Why PCR
 
@@ -264,10 +264,10 @@ subsequently returned 2,153 Elo [2,084, 2,235]. The two cheap follow-up evals we
 | sims=4,000 vs UCI=1,800 on **R2 v2 ep 14** | us-east-1 g6.2xlarge OD `i-0b24ea8a7fdd7d149` (~$5) | R2 v2 ep 14 had the highest sims=800 of the run (2,055) but was never deep-eval'd. **Landed 2026-05-26 23:06 UTC: 2,301 Elo [2,190, 2,601], point estimate above 2,300; the confidence interval includes values below 2,300.** |
 
 Per-ckpt sims=800 evals normally fire via the
-[autoeval daemon](https://github.com/shehio/world-models/blob/main/infra-eks/daemons/wm-autoeval-daemon.sh)
+[autoeval daemon](https://github.com/shehio/engine-distillation/blob/main/infra-eks/daemons/wm-autoeval-daemon.sh)
 when the operator laptop is on; ckpts crossing 1,940 trigger a
 sims=4,000 deep-read via the
-[`wm-deep-eval-daemon`](https://github.com/shehio/world-models/blob/main/infra-eks/daemons/wm-deep-eval-daemon.sh).
+[`wm-deep-eval-daemon`](https://github.com/shehio/engine-distillation/blob/main/infra-eks/daemons/wm-deep-eval-daemon.sh).
 With the laptop offline at the time, the two evals above were launched
 as one-shot scripts.
 
